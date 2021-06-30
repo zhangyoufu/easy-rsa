@@ -942,7 +942,7 @@ $ext_tmp"
 
 	# sign request
 	crt_out_tmp="$(easyrsa_mktemp)" || die "Failed to create temporary file"
-	easyrsa_openssl ca -utf8 -in "$req_in" -out "$crt_out_tmp" \
+	easyrsa_openssl ca -utf8 -in "$req_in" -notext -out "$crt_out_tmp" \
 		-extfile "$ext_tmp" -days "$EASYRSA_CERT_EXPIRE" -batch $opts ${EASYRSA_PASSIN:+-passin "$EASYRSA_PASSIN"} \
 		|| die "signing failed (openssl output above may have more detail)"
 	mv "$crt_out_tmp" "$crt_out"
