@@ -943,7 +943,7 @@ $ext_tmp"
 	# sign request
 	crt_out_tmp="$(easyrsa_mktemp)" || die "Failed to create temporary file"
 	easyrsa_openssl ca -utf8 -in "$req_in" -notext -out "$crt_out_tmp" \
-		-extfile "$ext_tmp" -days "$EASYRSA_CERT_EXPIRE" -batch $opts ${EASYRSA_PASSIN:+-passin "$EASYRSA_PASSIN"} \
+		-extfile "$ext_tmp" -days "$EASYRSA_CERT_EXPIRE" -batch $opts ${EASYRSA_REQ_CN_SET:+-subj "/CN=$EASYRSA_REQ_CN"} ${EASYRSA_PASSIN:+-passin "$EASYRSA_PASSIN"} \
 		|| die "signing failed (openssl output above may have more detail)"
 	mv "$crt_out_tmp" "$crt_out"
 	rm -f "$ext_tmp"
@@ -1529,7 +1529,11 @@ display_san() {
 # display cert DN info on a req/X509, passed by full pathname
 display_dn() {
 	format="$1" path="$2"
-	print "$("$EASYRSA_OPENSSL" "$format" -in "$path" -noout -subject -nameopt multiline)"
+	if [ "$format" = "req" ] && [ -n "$EASYRSA_REQ_CN_SET" ]; then
+		print "    commonName                = $EASYRSA_REQ_CN"
+	else
+		print "$("$EASYRSA_OPENSSL" "$format" -in "$path" -noout -subject -nameopt multiline)"
+	fi
 	san=$(display_san "$1" "$2")
 	if [ -n "$san" ]; then
 		print ""
@@ -2418,6 +2422,7 @@ while :; do
 	--dn-mode)
 		export EASYRSA_DN="$val" ;;
 	--req-cn)
+		EASYRSA_REQ_CN_SET=1
 		export EASYRSA_REQ_CN="$val" ;;
 	--digest)
 		export EASYRSA_DIGEST="$val" ;;
