@@ -2,7 +2,7 @@
 
 basicConstraints = CA:FALSE
 subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
+authorityKeyIdentifier = keyid:always
 extendedKeyUsage = serverAuth,clientAuth
 keyUsage = critical,digitalSignature,keyEncipherment
 
